@@ -7,17 +7,36 @@ $(document).ready(function(){
 
 function getOrders() {
     console.log("Yo there, it's me, the button");
-    var orders = getMock();
-    console.log("I M A PICKEL RIIIIIIICK!!!", orders);
-    return orders;
+    //var orders = getMock();
 
     fetch('https://api.hitbtc.com/api/2/public/ticker')  
-        .then(transformToJson)
-        .then(logResponse);
+    .then(transformToJson)
+    .then(logResponse)
+    .then(addTableHeader)
+    .then(addTableData)
+    .catch(logResponse);
 
     /** internal functions */
+    function logResponse(response) { 
+        console.log("I M A PICKEL RIIIIIIICK!!!", response) 
+        return response;
+    };
     function transformToJson(response) { return response.json(); }
-    function logResponse(response) { console.log(response); };
+    function addTableHeader(response) {
+        var keys = Object.keys(response[0]);
+        keys.forEach(function addHeader(item) { 
+            $('<th>'+item+'</th>').appendTo('#order-book');
+        });
+        return response;
+    }
+    function addTableData(response) {
+        response.forEach(function addRow(order) { 
+            $('<tr></tr>').appendTo('#order-book');
+            Object.values(order).forEach(function addCell(val) { 
+                $('<td>'+val+'</td>').appendTo($( "tr:last-of-type" ));
+            });
+        });
+    }
 }
 
 function getMock() {
